@@ -29,7 +29,9 @@
         />
         <UiDivider class-name="w-screen md:w-auto -mx-4 md:mx-0" />
         <div class="relative" :class="{ 'pointer-events-none opacity-50': disableShippingPayment }">
-          <ShippingMethod
+            Versandarten Bereich 1
+
+            <ShippingMethod
             :shipping-methods="shippingMethods"
             :disabled="disableShippingPayment"
             @update:shipping-method="handleShippingMethodUpdate($event)"
