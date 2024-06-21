@@ -36,6 +36,7 @@
         />
         <UiDivider class-name="w-screen md:w-auto -mx-4 md:mx-0" />
         <div class="relative" :class="{ 'pointer-events-none opacity-50': disableShippingPayment }">
+            Versandarten Bereich
           <ShippingMethod
             :shipping-methods="shippingMethods"
             :disabled="disableShippingPayment"
