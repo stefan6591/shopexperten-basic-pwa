@@ -1,122 +1,162 @@
 <template>
-  <div class="relative min-h-[600px]">
-    <div class="absolute w-full h-full z-[-1]">
-      <img
-        :src="background.image"
-        :width="getSizeForViewport(background.sizes).width"
-        :height="getSizeForViewport(background.sizes).height"
-        alt="Hero background"
-        class="absolute top-0 left-0 w-full h-full object-cover"
-        loading="lazy"
-      />
-    </div>
-    <div class="md:flex md:flex-row-reverse md:justify-center max-w-[1536px] mx-auto md:min-h-[600px]">
-      <div class="flex flex-col md:basis-2/4 md:items-stretch md:overflow-hidden">
-        <img
-          :src="headPhones.image"
-          :width="getSizeForViewport(headPhones.sizes).width"
-          :height="getSizeForViewport(headPhones.sizes).height"
-          alt="Headphones"
-          class="h-full object-cover object-left"
-          loading="lazy"
-        />
-      </div>
-      <div class="p-4 md:p-10 md:max-w-[768px] md:flex md:flex-col md:justify-center md:items-start md:basis-2/4">
-        <p class="typography-text-xs md:typography-text-sm font-bold tracking-widest text-neutral-500 uppercase">
-          {{ t('homepage.banner.moto1') }}
-        </p>
-        <h1 class="typography-display-2 md:typography-display-1 md:leading-[67.5px] font-bold mt-2 mb-4">
-          {{ t('homepage.banner.moto2') }}
-        </h1>
-        <p class="typography-text-base md:typography-text-lg">
-          {{ t('homepage.banner.moto3') }}
-        </p>
-        <div class="flex flex-col md:flex-row gap-4 mt-6">
-          <SfButton size="lg"> {{ t('homepage.banner.orderNow') }}</SfButton>
-          <SfButton size="lg" variant="secondary" class="bg-white"> {{ t('homepage.banner.showMore') }}</SfButton>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="max-w-screen-3xl mx-auto md:px-6 lg:px-10">
-    <div class="flex flex-wrap gap-4 lg:gap-6 lg:flex-no-wrap justify-center my-10">
-      <div
-        v-for="{ title, image } in categories"
-        :key="title"
-        role="img"
-        :aria-label="title"
-        :aria-labelledby="`image-${title}`"
-        class="relative flex-col min-w-[140px] max-w-[360px] justify-center group"
+  <div>
+    <!-- SLIDER BEGIN -->
+    <div
+      class="relative max-h-[600px] flex flex-col w-full aspect-[4/3] gap-1 mx-auto flex flex-col max-h-[600px] aspect-[4/3] md:justify-center"
+    >
+      <SfScrollable
+        class="w-full h-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        :active-index="activeIndex"
+        wrapper-class="h-full group/scrollable"
+        is-active-index-centered
+        :previous-disabled="activeIndex === 0"
+        :next-disabled="activeIndex === images.length - 1"
+        buttons-placement="block"
+        @on-prev="activeIndex -= 1"
+        @on-next="activeIndex += 1"
+        :drag="{ containerWidth: true }"
+        @on-drag-end="onDragged"
       >
-        <img
-          :src="image"
-          :alt="title"
-          format="avif"
-          class="rounded-full bg-neutral-100 group-hover:shadow-xl group-active:shadow-none"
-          width="360"
-          height="360"
-          loading="lazy"
-        />
-        <div :id="`image-${title}`" class="flex justify-center">
-          <div
-            class="mt-4 font-semibold no-underline text-normal-900 typography-text-base group-hover:text-primary-800 group-active:text-primary-800"
+        <template #previousButton="defaultProps">
+          <SfButton
+            v-bind="defaultProps"
+            :disabled="activeIndex === 0"
+            class="absolute hidden group-hover/scrollable:block disabled:!hidden !rounded-full !p-3 z-10 top-1/2 left-4 bg-white"
+            variant="secondary"
+            size="lg"
+            square
           >
-            {{ title }}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="flex flex-col md:flex-row flex-wrap gap-6 mt-max-w-[1540px]">
-      <div
-        v-for="details in displayDetails"
-        :key="details.title"
-        :class="[
-          'relative flex md:max-w-[1536px] md:[&:not(:first-of-type)]:flex-1 md:first-of-type:w-full',
-          details.backgroundColor,
-        ]"
-      >
-        <div :class="['flex justify-between overflow-hidden grow', { 'flex-row-reverse': details.reverse }]">
-          <div class="flex flex-col justify-center items-start p-6 lg:p-10 max-w-1/2">
-            <p :class="['uppercase typography-text-xs block font-bold tracking-widest', details.subtitleClass]">
-              {{ details.subtitle }}
-            </p>
-            <h2 :class="['mb-4 mt-2 font-bold typography-display-3', details.titleClass]">
-              {{ details.title }}
-            </h2>
-            <p class="typography-text-base block mb-4">
-              {{ details.description }}
-            </p>
-            <NuxtLink to="/">
-              <SfButton class="!bg-black hover:!bg-white hover:!text-black">{{ details.buttonText }}</SfButton>
-            </NuxtLink>
-          </div>
+            <SfIconChevronLeft />
+          </SfButton>
+        </template>
+        <div
+          v-for="({ imageSrc, alt }, index) in images"
+          :key="`${alt}-${index}`"
+          class="relative flex justify-center basis-full snap-center snap-always shrink-0 grow"
+        >
           <img
-            :src="details.image"
-            :alt="details.title"
-            :width="getSizeForViewport(details.sizes).width"
-            :height="getSizeForViewport(details.sizes).height"
-            class="self-end object-contain"
-            loading="lazy"
+            :aria-label="alt"
+            :aria-hidden="activeIndex !== index"
+            class="w-auto h-full"
+            :alt="alt"
+            :src="imageSrc"
+            draggable="false"
+          />
+        </div>
+        <template #nextButton="defaultProps">
+          <SfButton
+            v-bind="defaultProps"
+            :disabled="activeIndex === images.length - 1"
+            class="absolute hidden group-hover/scrollable:block disabled:!hidden !rounded-full !p-3 z-10 top-1/2 right-4 bg-white"
+            variant="secondary"
+            size="lg"
+            square
+          >
+            <SfIconChevronRight />
+          </SfButton>
+        </template>
+      </SfScrollable>
+      <div class="flex-shrink-0 basis-auto">
+        <div
+          class="flex-row w-full flex gap-0.5 mt [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
+          <button
+            v-for="({ alt }, index) in images"
+            :key="`${index}-bullet`"
+            :aria-current="activeIndex === index"
+            :aria-label="alt"
+            :class="[
+              'w-full relative mt-1 border-b-4 transition-colors focus-visible:outline focus-visible:outline-offset-0 pointer-events-none',
+              activeIndex === index ? 'border-primary-700' : 'border-gray-200',
+            ]"
+            @click="activeIndex = index"
           />
         </div>
       </div>
     </div>
-    <NuxtLazyHydrate when-visible>
-      <NewsletterSubscribe />
-    </NuxtLazyHydrate>
-    <NuxtLazyHydrate when-visible>
-      <section class="mx-4 mt-28 mb-20 overflow-hidden">
-        <p data-testid="recommended-products" class="my-4 typography-text-lg">
-          {{ t('moreItemsOfThisCategory') }}
-        </p>
-        <ProductRecommendedProducts cache-key="homepage" :category-id="recommendedProductsCategoryId" />
-      </section>
-    </NuxtLazyHydrate>
+    <!-- SLIDER END -->
+      <div class="max-w-screen-3xl mx-auto md:px-6 lg:px-10">
+
+    <!-- TITLE BEGIN -->
+    <div class="relative mx-auto flex md:justify-center p-4">
+      <h1 class="align-center">
+        <strong>Demoshop<br /></strong> Fachhandel für Gewürze aus aller Welt
+      </h1>
+    </div>
+    <!-- TITLE END -->
+
+    <!-- CATEGORIES BEGIN -->
+          <div class="flex flex-wrap gap-4 lg:gap-6 lg:flex-no-wrap justify-center my-10">
+              <div
+                      v-for="{ title, image } in categories1"
+                      :key="title"
+                      role="img"
+                      :aria-label="title"
+                      :aria-labelledby="`image-${title}`"
+                      class="relative flex-col min-w-[140px] max-w-[360px] justify-center group"
+              >
+                  <img
+                          :src="image"
+                          :alt="title"
+                          format="png"
+                          class=""
+                          width="360"
+                          height="240"
+                          loading="lazy"
+                  />
+                  <div :id="`image-${title}`" class="flex justify-center">
+                      <div
+                              class="mt-4 font-semibold no-underline text-normal-900 typography-text-base group-hover:text-primary-800 group-active:text-primary-800"
+                      >
+                          {{ title }}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="flex flex-wrap gap-4 lg:gap-6 lg:flex-no-wrap justify-center my-10">
+              <div
+                      v-for="{ title, image } in categories2"
+                      :key="title"
+                      role="img"
+                      :aria-label="title"
+                      :aria-labelledby="`image-${title}`"
+                      class="relative flex-col min-w-[140px] max-w-[360px] justify-center group"
+              >
+                  <img
+                          :src="image"
+                          :alt="title"
+                          format="png"
+                          class=""
+                          width="360"
+                          height="240"
+                          loading="lazy"
+                  />
+                  <div :id="`image-${title}`" class="flex justify-center">
+                      <div
+                              class="mt-4 font-semibold no-underline text-normal-900 typography-text-base group-hover:text-primary-800 group-active:text-primary-800"
+                      >
+                          {{ title }}
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+
+          <!-- CATEGORIES END -->
+
+</div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { SfButton } from '@storefront-ui/vue';
+import { ref } from 'vue';
+import {
+  SfScrollable,
+  SfButton,
+  SfIconChevronLeft,
+  SfIconChevronRight,
+  type SfScrollableOnDragEndData,
+} from '@storefront-ui/vue';
 const viewport = useViewport();
 const { t } = useI18n();
 const { data: categoryTree } = useCategoryTree();
@@ -147,16 +187,16 @@ watch(
   },
   { immediate: true },
 );
+
 const displayDetails = computed(() => {
   return [
     {
-      image: `/images/${viewport.breakpoint.value}/homepage-display-1.avif`,
+      image: `https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/Gewuerze/Gewuerzmischung.jpg`,
       title: t('homepage.displayDetails.detail1.title'),
       subtitle: t('homepage.displayDetails.detail1.subtitle'),
       description: t('homepage.displayDetails.detail1.description'),
       buttonText: t('homepage.displayDetails.detail1.buttonText'),
       reverse: false,
-      backgroundColor: 'bg-negative-200',
       titleClass: 'md:typography-display-2',
       subtitleClass: 'md:typography-headline-6',
       descriptionClass: 'md:typography-text-lg',
@@ -223,6 +263,7 @@ const displayDetails = computed(() => {
     },
   ];
 });
+
 const headPhones = {
   image: `/images/${viewport.breakpoint.value}/homepage-hero-headphones.avif`,
   sizes: {
@@ -240,6 +281,7 @@ const headPhones = {
     },
   },
 };
+
 const background = {
   image: `/images/${viewport.breakpoint.value}/homepage-hero-bg.avif`,
   sizes: {
@@ -257,20 +299,32 @@ const background = {
     },
   },
 };
-const categories = [
+
+const categories1 = [
   {
-    title: t('homepage.women'),
-    image: '/images/homepage-women-category.avif',
+    title: t('homepage.cat1'),
+    image: 'https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/pwa/homepage/gewuerzmischung.png',
   },
   {
-    title: t('homepage.men'),
-    image: '/images/homepage-men-category.avif',
+    title: t('homepage.cat2'),
+    image: 'https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/pwa/homepage/gewuerze.png',
   },
   {
-    title: t('homepage.kid'),
-    image: '/images/homepage-kid-category.avif',
+    title: t('homepage.cat3'),
+    image: 'https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/pwa/homepage/tee.png',
   },
 ];
+const categories2 = [
+    {
+        title: t('homepage.cat4'),
+        image: 'https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/pwa/homepage/sale.png',
+    },
+    {
+        title: t('homepage.cat5'),
+        image: 'https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/pwa/homepage/sets.png',
+    },
+];
+
 
 useHead({
   link: [
@@ -286,4 +340,21 @@ useHead({
     },
   ],
 });
+
+const withBase = (filepath: string) => `https://cdn02.plentymarkets.com/8mxess9fwmd8/frontend/Gewuerze/${filepath}`;
+
+const images = [
+  { imageSrc: withBase('Startseite.jpg'), imageThumbSrc: withBase('Startseite.jpg'), alt: 'backpack1' },
+  { imageSrc: withBase('Startseite1-2.jpg'), imageThumbSrc: withBase('Startseite1-2.jpg'), alt: 'backpack2' },
+];
+
+const activeIndex = ref(0);
+
+const onDragged = (event: SfScrollableOnDragEndData) => {
+  if (event.swipeRight && activeIndex.value > 0) {
+    activeIndex.value -= 1;
+  } else if (event.swipeLeft && activeIndex.value < images.length - 1) {
+    activeIndex.value += 1;
+  }
+};
 </script>
