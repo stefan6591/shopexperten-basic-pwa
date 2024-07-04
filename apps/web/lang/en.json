@@ -391,6 +391,7 @@
   "readLess": "Read less",
   "noReviews": "No reviews",
   "loading": "Loading...",
+  "topseller": "Our topseller",
   "gallery": {
     "count": "{current} of {total}",
     "thumb": "Go to slide {index}",

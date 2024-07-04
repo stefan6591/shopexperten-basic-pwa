@@ -391,6 +391,7 @@
   "readLess": "Weniger lesen",
   "noReviews": "Keine Bewertungen",
   "loading": "Wird geladen...",
+  "topseller": "Unsere Topseller",
   "gallery": {
     "count": "{current} von {total}",
     "thumb": "Zu Bild {index}",
