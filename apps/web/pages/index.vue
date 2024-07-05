@@ -138,9 +138,19 @@
                 </div>
             </div>
             <!-- CATEGORIES END -->
-            <!-- ITEM LIST BEGIN -->
+            <!-- ITEM LIST 1 BEGIN -->
             <NuxtLazyHydrate when-visible>
-                <section class="mx-4 mt-28 mb-20 overflow-hidden">
+                <section class="mt-28 mb-20 overflow-hidden">
+                    <p data-testid="recommended-products" class="my-4 typography-text-lg">
+                        {{ t('topseller') }}
+                    </p>
+                    <ProductRecommendedProducts cache-key="homepage" :category-id="recommendedProductsCategoryId" />
+                </section>
+            </NuxtLazyHydrate>
+            <!-- ITEM LIST 1 END -->
+            <!-- ITEM LIST 2 BEGIN -->
+            <NuxtLazyHydrate when-visible>
+                <section class="mt-28 mb-20 overflow-hidden">
                     <p data-testid="recommended-products" class="my-4 typography-text-lg">
                         {{ t('topseller') }}
                     </p>
@@ -148,7 +158,7 @@
                 </section>
             </NuxtLazyHydrate>
 
-            <!-- ITEM LIST END -->
+            <!-- ITEM LIST 2 END -->
             <!-- SEO TEXT BEGIN -->
             <div>
                 <h2>Willkommen im DemoShop – Ihr Online-Ziel für hochwertige Produkte</h2>
@@ -201,14 +211,17 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import {
-    SfScrollable,
+    SfLink,
     SfButton,
+    SfIconFavorite,
     SfIconChevronLeft,
     SfIconChevronRight,
+    SfScrollable,
     type SfScrollableOnDragEndData,
 } from '@storefront-ui/vue';
+
 const viewport = useViewport();
 const { t } = useI18n();
 const { data: categoryTree } = useCategoryTree();
@@ -408,4 +421,15 @@ const onDragged = (event: SfScrollableOnDragEndData) => {
         activeIndex.value += 1;
     }
 };
+
+const products = Array.from(Array(10), (_, i) => ({
+    id: i.toString(),
+    name: 'Athletic mens walking sneakers',
+    price: '$2,345.99',
+    img: {
+        src: 'https://storage.googleapis.com/sfui_docs_artifacts_bucket_public/production/sneakers.png',
+        alt: 'White sneaker shoe',
+    },
+}));
 </script>
+
